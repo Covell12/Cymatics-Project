@@ -7,7 +7,6 @@ const AudioRecorder = ({ onData }) => {
   const analyserRef = useRef(null);
   const dataArrayRef = useRef(null);
 
-  // Wrap startRecording in useCallback so its reference is stable
   const startRecording = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -22,7 +21,7 @@ const AudioRecorder = ({ onData }) => {
       const updateFrequencyData = () => {
         if (!analyserRef.current) return;
         analyserRef.current.getByteFrequencyData(dataArrayRef.current);
-        onData([...dataArrayRef.current]); // Pass data to parent component
+        onData([...dataArrayRef.current]); // Pass frequency array upward
         if (isRecording) {
           requestAnimationFrame(updateFrequencyData);
         }
@@ -34,7 +33,6 @@ const AudioRecorder = ({ onData }) => {
     }
   }, [onData, isRecording]);
 
-  // Wrap stopRecording in useCallback as well
   const stopRecording = useCallback(() => {
     if (audioContextRef.current) {
       audioContextRef.current.close();
@@ -48,7 +46,6 @@ const AudioRecorder = ({ onData }) => {
     } else {
       stopRecording();
     }
-    // Cleanup on unmount
     return () => {
       stopRecording();
     };
